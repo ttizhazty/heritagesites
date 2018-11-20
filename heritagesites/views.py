@@ -10,6 +10,8 @@ from django.utils.decorators import method_decorator
 from django.shortcuts import redirect
 from .models import HeritageSiteJurisdiction
 from django.http import HttpResponseRedirect
+from .filters import HeritageSiteFilter
+from django_filters.views import FilterView
 def index(request):
 	return HttpResponse("Hello, world. You're at the UNESCO Heritage Sites index page.")
 
@@ -45,6 +47,9 @@ class CountryAreaListView(generic.ListView):
 	def get_queryset(self):
 		return CountryArea.objects.all().select_related('dev_status', 'location').order_by('country_area_name')
 '''
+class SiteFilterView(FilterView):
+	filterset_class = HeritageSiteFilter
+	template_name = 'heritagesites/site_filter.html'
 
 @method_decorator(login_required, name='dispatch')
 class CountryAreaListView(generic.ListView):

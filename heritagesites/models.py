@@ -106,6 +106,69 @@ class HeritageSite(models.Model):
     def get_absolute_url(self):
         # return reverse('site_detail', args=[str(self.id)])
         return reverse('site_detail', kwargs={'pk': self.pk})
+    
+    @property
+    def country_area_names(self):
+        countries = self.country_area.select_related('location').order_by('country_area_name')
+        names = []
+        for country in countries:
+            name = country.country_area_name
+            if name is None:
+                continue
+            iso_code = country.iso_alpha3_code
+
+            name_and_code = ''.join([name, ' (', iso_code, ')'])
+            if name_and_code not in names:
+                names.append(name_and_code)
+        return ', '.join(names)
+
+    @property 
+    def region_names(self):
+        regions = self.country_area.select_related('location__region').order_by('location__region__region_name')
+        names = []
+        for region in regions:
+            try:
+                name = region.location.region.region_name
+            except:
+                name = None
+            if name is None:
+                continue
+            if name not in names:
+                names.append(name)
+        return ', '.join(names)
+    
+    @property
+    def sub_region_names(self):
+        sub_regions = self.country_area.select_related('location__sub_region').order_by('location__sub_region__sub_region_name')
+        names = []
+        for sub_region in sub_regions:
+            try:
+                name =sub_region.location.sub_region.sub_region_name
+            except:
+                name = None
+            if name is None:
+                continue    
+            if name not in names:
+                names.append(name)
+        
+        return ', '.join(names)
+
+
+    @property
+    def intermediate_region_names(self):
+        intermediate_regions = self.country_area.select_related('location__intermediate_region').order_by('location__intermediate_region__intermediate_region_name')
+        names = []
+        for intermediate_region in intermediate_regions:
+            try:
+                name = intermediate_region.location.intermediate_region.intermediate_region_name
+            except:
+                name = None
+            if name is None:
+                continue
+            if name not in names:
+                names.append(name)
+    
+        return ', '.join(names)
 
 '''
 class HeritageSite(models.Model):
